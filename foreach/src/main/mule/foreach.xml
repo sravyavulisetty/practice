@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:batch="http://www.mulesoft.org/schema/mule/batch" xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="1b319377-cb61-4b6e-9b66-c992291b660d" >
+		<http:listener-connection host="localhost" port="8081" />
+	</http:listener-config>
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="fdf4e4e3-2f56-45df-bc0d-431bda521f3a" >
+		<db:my-sql-connection host="localhost" port="3306" user="root" password="Ramanvitha@44" database="db20" />
+	</db:config>
+	<file:config name="File_Config" doc:name="File Config" doc:id="8c418607-bde8-4b04-a29b-a24f790a8751" />
+	<db:config name="Database_Config1" doc:name="Database Config" doc:id="cf2fa0a7-1bb8-49cd-8609-2f0d5b5dc664" >
+		<db:my-sql-connection host="localhost" port="3306" user="root" password="Ramanvitha@44" database="db20" />
+	</db:config>
+	<db:config name="Database_Config2" doc:name="Database Config" doc:id="ada04fd5-a184-48b3-ac3c-64a9e7c07397" >
+		<db:my-sql-connection host="localhost" port="3306" user="root" password="Ramanvitha@44" database="db20" />
+	</db:config>
+	<file:config name="File_Config1" doc:name="File Config" doc:id="5ed56d27-afdc-422d-9dc0-bfe2f5e5cbc8" />
+	<flow name="foreachFlow" doc:id="f040662d-ab2c-4468-b3ce-fe0b1cf8a84a" >
+		<file:listener doc:name="On New or Updated File" doc:id="4fcd3781-dbfc-4c77-bacb-e106d8dcbc6f" config-ref="File_Config1" directory="C:\Users\Lenovo\OneDrive\Desktop\csv file" outputMimeType="application/csv">
+			<scheduling-strategy >
+				<fixed-frequency />
+			</scheduling-strategy>
+		</file:listener>
+		<ee:transform doc:name="Transform Message" doc:id="9aa70f07-dd3c-4f95-838b-0f0a95837a36" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json 
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<parallel-foreach doc:name="Parallel For Each" doc:id="dc0d1ea8-f5f5-43d1-a6e9-c0434a735a0e" >
+			<logger level="INFO" doc:name="Logger" doc:id="180c844d-23d4-46cd-8519-a800afee90c6" message="#[payload]"/>
+			<db:insert doc:name="Insert" doc:id="80724791-aa0b-4c99-8bfc-a479df2926d3" config-ref="Database_Config2">
+				<db:sql ><![CDATA[INSERT INTO db20.data(username, identifier, first name, last name)
+VALUES(:username, :identifier, :first name, :last name);]]></db:sql>
+				<db:input-parameters ><![CDATA[#[payload]]]></db:input-parameters>
+			</db:insert>
+		</parallel-foreach>
+		<ee:transform doc:name="Transform Message" doc:id="fcc60bb7-b923-43c1-bfa9-b425d032c7d9" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
