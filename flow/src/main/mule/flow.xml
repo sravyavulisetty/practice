@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="57c60686-d25b-4892-9b22-2482fd58fe95" >
+		<http:listener-connection host="localhost" port="8081" />
+	</http:listener-config>
+	<vm:config name="VM_Config" doc:name="VM Config" doc:id="92c1e232-6495-4f76-b388-6b505d89ec78">
+		<vm:queues >
+			<vm:queue queueName="Pqueue" maxOutstandingMessages="5" />
+		</vm:queues>
+	</vm:config>
+	<flow name="flowFlow" doc:id="8ddb0403-ba82-4020-b8f9-d0167e60ab71" >
+		<http:listener doc:name="Listener" doc:id="46d39b8e-2d96-4802-8cc8-9807a3c760f6" config-ref="HTTP_Listener_config" path="/flow"/>
+		<logger level="INFO" doc:name="Logger" doc:id="d5fe61c4-3a9d-4a0a-86d5-899823e98942" message="bhhiu"/>
+		<vm:publish queueName="Pqueue" doc:name="Publish" doc:id="4561ef36-68e4-4be6-abc8-4a721b363c7c" config-ref="VM_Config">
+		</vm:publish>
+		<logger level="INFO" doc:name="Logger" doc:id="67fe4803-7aee-4205-acb4-aa948095ab59" message="#[payload]"/>
+	</flow>
+	<flow name="flowFlow1" doc:id="67abc9cf-d57f-4a63-a9a6-c28899356d94" >
+		<vm:listener doc:name="Listener" doc:id="2dd6e802-795d-41de-8a35-770945d62103" config-ref="VM_Config" queueName="Pqueue">
+		</vm:listener>
+		<logger level="INFO" doc:name="Logger" doc:id="c6ec0914-dac3-46a3-a794-f1a919c900e9" message="#[payload]"/>
+	</flow>
+</mule>
