@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="046b5601-4ac8-4d42-b241-d5ff41440427" >
+		<http:listener-connection host="localhost" port="8081" />
+	</http:listener-config>
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="9bd13675-b5ce-4ac1-8e8a-bfb2adcbd57e" >
+		<db:my-sql-connection host="localhost" port="3306" user="root" password="Ramanvitha@44" database="db20" />
+	</db:config>
+	<flow name="rflowFlow" doc:id="25b36062-e868-4efa-889e-e662dbd25a40" >
+		<http:listener doc:name="Listener" doc:id="9537d308-21c0-40e1-9c8e-d918ce4894df" config-ref="HTTP_Listener_config" path="rflow"/>
+		<db:select doc:name="Select" doc:id="759cdfa3-dc38-42ce-a39e-182897026b74" config-ref="Database_Config">
+			<db:sql ><![CDATA[select * from db20.student where id=201;]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="428c6e3d-af65-44cf-b32e-50fbb5b8a7dc" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="9d385630-235c-413a-90ff-f4ec2fcdb66c" message="#[payload]"/>
+	</flow>
+</mule>
